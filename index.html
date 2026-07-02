@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MBTI 动漫人格测试 · 完整版</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Segoe UI", system-ui, sans-serif; background: #0f0f1a; color: #e2e8f0; min-height: 100vh; overflow-x: hidden; }
+.bg { position: fixed; inset: 0; z-index: 0; background: radial-gradient(ellipse at 20% 50%, rgba(59,130,246,0.08), transparent 60%), radial-gradient(ellipse at 80% 50%, rgba(168,85,247,0.08), transparent 60%), radial-gradient(ellipse at 50% 0%, rgba(236,72,153,0.06), transparent 50%); }
+.particle { position: fixed; width: 3px; height: 3px; background: rgba(255,255,255,0.15); border-radius: 50%; animation: float linear infinite; z-index: 0; }
+@keyframes float { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-10vh) scale(1); opacity: 0; } }
+.container { position: relative; z-index: 1; max-width: 540px; margin: 0 auto; padding: 20px 16px 60px; }
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.5s; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.hero { text-align: center; padding: 40px 0; }
+.hero h1 { font-size: 2rem; background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; }
+.hero p { color: #94a3b8; font-size: 0.95rem; margin-bottom: 32px; }
+.color-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 28px; }
+.cg { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px; text-align: center; font-size: 0.82rem; }
+.btn { padding: 14px 36px; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #fff; border: none; border-radius: 14px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 20px rgba(99,102,241,0.3); }
+.btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(99,102,241,0.45); }
+.progress-wrap { margin-bottom: 20px; }
+.progress-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #6366f1, #a78bfa); border-radius: 3px; transition: width 0.4s; }
+.progress-text { text-align: center; font-size: 0.8rem; color: #64748b; margin-top: 6px; }
+.q-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 28px 20px; margin-bottom: 16px; }
+.q-num { font-size: 0.78rem; color: #6366f1; font-weight: 700; margin-bottom: 8px; }
+.q-text { font-size: 1.05rem; font-weight: 600; line-height: 1.6; margin-bottom: 22px; }
+.q-opts { display: flex; gap: 10px; }
+.q-opt { flex: 1; padding: 14px 10px; background: rgba(255,255,255,0.04); border: 2px solid rgba(255,255,255,0.08); border-radius: 12px; text-align: center; cursor: pointer; font-size: 0.88rem; transition: all 0.25s; user-select: none; }
+.q-opt:hover { border-color: rgba(99,102,241,0.4); background: rgba(99,102,241,0.08); }
+.q-opt.selected { border-color: #6366f1; background: rgba(99,102,241,0.15); color: #a5b4fc; }
+.nav-btns { display: flex; gap: 10px; margin-top: 18px; }
+.nav-btn { flex: 1; padding: 12px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #e2e8f0; border-radius: 10px; cursor: pointer; font-size: 0.9rem; transition: all 0.2s; }
+.nav-btn:hover { background: rgba(255,255,255,0.08); }
+.result-hero { text-align: center; padding: 20px 0; }
+.result-type { font-size: 2.8rem; font-weight: 900; background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
+.result-name { font-size: 1.2rem; color: #a5b4fc; margin-bottom: 2px; }
+.result-alias { font-size: 0.85rem; color: #64748b; margin-bottom: 16px; }
+.result-avatar { width: 120px; height: 120px; margin: 0 auto 20px; border-radius: 50%; overflow: hidden; border: 3px solid rgba(99,102,241,0.4); background: #1e1e3a; display: flex; align-items: center; justify-content: center; }
+.color-badge { display: inline-block; padding: 5px 16px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; margin-bottom: 20px; }
+.result-dims { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+.dim-bar { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 14px; min-width: 65px; text-align: center; }
+.dim-bar .dim-label { font-size: 0.72rem; color: #64748b; margin-bottom: 3px; }
+.dim-bar .dim-val { font-size: 1.1rem; font-weight: 700; }
+.section { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; margin-bottom: 16px; }
+.section-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.tag-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.tag { padding: 5px 14px; background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.2); border-radius: 20px; font-size: 0.82rem; color: #a5b4fc; }
+.sw-list { display: flex; flex-direction: column; gap: 10px; }
+.sw-item { background: rgba(255,255,255,0.03); border-radius: 10px; padding: 12px 14px; font-size: 0.88rem; line-height: 1.6; border-left: 3px solid #6366f1; }
+.sw-item.weak { border-left-color: #f87171; }
+.sw-item .sw-label { font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.char-card { display: flex; gap: 14px; align-items: flex-start; background: rgba(255,255,255,0.03); border-radius: 14px; padding: 16px; border: 1px solid rgba(255,255,255,0.06); }
+.char-avatar { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 2px solid rgba(99,102,241,0.3); display: flex; align-items: center; justify-content: center; }
+.char-info h4 { font-size: 0.95rem; margin-bottom: 2px; }
+.char-info .anime { font-size: 0.78rem; color: #64748b; margin-bottom: 8px; }
+.char-info .story { font-size: 0.84rem; line-height: 1.7; color: #cbd5e1; margin-bottom: 8px; }
+.char-info .quote { font-size: 0.84rem; color: #a78bfa; font-style: italic; }
+.all-types { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+.at-item { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 8px; text-align: center; cursor: pointer; transition: all 0.2s; font-size: 0.75rem; }
+.at-item:hover { border-color: rgba(99,102,241,0.4); background: rgba(99,102,241,0.08); }
+.at-item .at-type { font-weight: 700; margin-bottom: 2px; }
+.at-item .at-name { font-size: 0.68rem; color: #94a3b8; }
+.action-btns { display: flex; gap: 10px; margin-top: 24px; justify-content: center; }
+.action-btn { padding: 12px 24px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: #e2e8f0; border-radius: 10px; cursor: pointer; font-size: 0.88rem; transition: all 0.2s; }
+.action-btn:hover { background: rgba(255,255,255,0.08); }
+.action-btn.primary { background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div id="particles"></div>
+<div class="container">
+<div class="page active" id="page-start">
+  <div class="hero">
+    <h1>MBTI 动漫人格测试</h1>
+    <p>28道题 · 科学分析 · 动漫风格 · 完整报告</p>
+    <div class="color-groups">
+      <div class="cg" style="border-color: #3b82f644">
+        <div><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#3b82f6;vertical-align:middle;margin-right:6px;"></span><span style="color:#3b82f6;font-weight:700;">蓝色组·分析家</span></div>
+        <div style="color:#94a3b8;margin-top:4px;font-size:0.82rem;">INTJ · INTP · ENTJ · ENTP</div>
+        <div style="color:#64748b;font-size:0.75rem;margin-top:2px;">理性分析型，追求逻辑与效率</div>
+      </div>
+      <div class="cg" style="border-color: #22c55e44">
+        <div><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#22c55e;vertical-align:middle;margin-right:6px;"></span><span style="color:#22c55e;font-weight:700;">绿色组·外交家</span></div>
+        <div style="color:#94a3b8;margin-top:4px;font-size:0.82rem;">INFJ · INFP · ENFJ · ENFP</div>
+        <div style="color:#64748b;font-size:0.75rem;margin-top:2px;">共情理想型，追求和谐与意义</div>
+      </div>
+      <div class="cg" style="border-color: #eab30844">
+        <div><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#eab308;vertical-align:middle;margin-right:6px;"></span><span style="color:#eab308;font-weight:700;">金色组·守护者</span></div>
+        <div style="color:#94a3b8;margin-top:4px;font-size:0.82rem;">ISTJ · ISFJ · ESTJ · ESFJ</div>
+        <div style="color:#64748b;font-size:0.75rem;margin-top:2px;">务实负责型，追求秩序与服务</div>
+      </div>
+      <div class="cg" style="border-color: #ef444444">
+        <div><span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#ef4444;vertical-align:middle;margin-right:6px;"></span><span style="color:#ef4444;font-weight:700;">红色组·探险家</span></div>
+        <div style="color:#94a3b8;margin-top:4px;font-size:0.82rem;">ISTP · ISFP · ESTP · ESFP</div>
+        <div style="color:#64748b;font-size:0.75rem;margin-top:2px;">自由行动型，追求体验与刺激</div>
+      </div>
+    </div>
+    <button class="btn" onclick="startTest()">开始测试 ✦</button>
+  </div>
+</div>
+<div class="page" id="page-test">
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+    <div class="progress-text" id="prog-text"></div>
+  </div>
+  <div class="q-card" id="q-card">
+    <div class="q-num" id="q-num"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="q-opts" id="q-opts"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="nav-btn" id="btn-prev" onclick="prevQ()">上一题</button>
+    <button class="nav-btn" id="btn-next" onclick="nextQ()" style="display:none">下一题</button>
+    <button class="nav-btn" id="btn-submit" onclick="submitTest()" style="display:none;background:rgba(99,102,241,0.2);border-color:#6366f1">查看结果</button>
+  </div>
+</div>
+<div class="page" id="page-result"></div>
+</div>
+<script>
+window.TYPES = {"INTJ":{"name":"建筑师","alias":"水牛灰","group":"blue","traits":["独立","果断","有远见","高标准"],"strengths":["战略思维强，善于长远规划，能看到别人看不到的路径","自律高效，执行力极强，对自己和他人都有高要求","求知欲强，持续自我提升，不满足于现状","独立思考，不随波逐流，敢于坚持自己的判断"],"weaknesses":["过于严苛，对他人期望过高，容易让人感到压力","情感表达匮乏，有时显得冷漠，不善于处理情感问题","固执己见，难以接受批评，容易陷入确认偏误","完美主义倾向，在细节上纠结过久，反而导致拖延"],"char":"薇尔莉特·伊芙加登","charAnime":"《紫罗兰永恒花园》","charStory":"薇尔莉特曾是战场上毫无感情的武器，在战后成为自动手记人偶。她一生都在追寻爱的含义，从只懂服从命令的军人，逐渐成长为能理解他人情感的独立女性。她的冷静、自律和对任务的极致追求，正是INTJ的典型写照。","charQuote":"人只要活着，就会变强。","svgc":["#1a1a2e","#16213e","#0f3460"]},"INTP":{"name":"逻辑学家","alias":"冰川灰","group":"blue","traits":["好奇","创新","分析","超然"],"strengths":["逻辑分析能力极强，能看穿问题本质，提出系统性解决方案","创新思维活跃，常常提出令人耳目一新的独特见解","开放包容，乐于接纳不同观点，不会轻易否定他人","专注深度极高，一旦沉浸于兴趣领域便废寝忘食"],"weaknesses":["拖延严重，想法很多却难以落地执行，容易半途而废","社交回避倾向，不擅长建立和维护亲密关系","过于理论化，有时忽视现实细节和实际可行性","对自己想法过度自信，难以接受别人的质疑"],"char":"御坂美琴","charAnime":"《魔法禁书目录/某科学的超电磁炮》","charStory":"作为学园都市最强的Level 5超能力者之一，美琴拥有极强的实力和自信。但她最迷人的地方是对朋友的珍视和对正义的坚持。她有时会因为自己的理论或判断而固执，但在关键时刻总能做出正确的选择。","charQuote":"我只是想保护我想要保护的人而已！","svgc":["#2d3436","#636e72","#b2bec3"]},"ENTJ":{"name":"指挥官","alias":"烈焰红","group":"blue","traits":["果断","自信","领导力","高效"],"strengths":["天生的领导者，善于组织和指挥团队，目标感极强","战略眼光独到，善于规划全局，不会被细节拖累","自信果断，敢于承担风险，在危机中能稳住局面","执行力极强，说到做到，是团队中最可靠的核心"],"weaknesses":["控制欲强，难以放权，容易micromanage他人","对能力弱者缺乏耐心，说话直率容易伤人","过于强势，有时会因为坚持己见而忽略团队意见","工作狂倾向，容易忽视个人生活和人际关系"],"char":"利姆鲁·特恩佩斯特","charAnime":"《关于我转生变成史莱姆这档事》","charStory":"利姆鲁从一名普通上班族转生为史莱姆，凭借智慧、领导力和强大的能力，逐步建立起一个各种族共存的国度。他目标明确、执行力强，同时善于发现并培养他人的才能，是典型的ENTJ领导者。","charQuote":"我要创造一个让所有人都能幸福生活的国家。","svgc":["#2d3436","#d63031","#e17055"]},"ENTP":{"name":"辩论家","alias":"电光蓝","group":"blue","traits":["机智","创新","挑战","好奇"],"strengths":["思维敏捷，善于辩论和说服，能从多个角度分析问题","创意无限，常常提出颠覆性的想法和解决方案","适应力极强，能在变化中找到机会，不受框架束缚","社交魅力十足，能言善辩，是团队中的点子王"],"weaknesses":["缺乏耐心，难以坚持完成长期项目，容易喜新厌旧","喜欢争论，有时为了辩论而辩论，容易得罪人","注意力过于分散，同时开启太多项目反而一事无成","规则破坏者，有时会因为挑战权威而陷入不必要的麻烦"],"char":"五条悟","charAnime":"《咒术回战》","charStory":"五条悟作为现代最强的咒术师，拥有绝对的实力和自信。他敢于挑战诅咒师协会的腐败规则，用自己独特的方式培养新一代。他的创新思维和不拘一格的行事风格，正是ENTP的典型写照。","charQuote":"天上天下，唯我独尊。","svgc":["#6c5ce7","#a29bfe","#fd79a8"]},"INFJ":{"name":"提倡者","alias":"翡翠绿","group":"green","traits":["理想主义","洞察力强","有原则","神秘"],"strengths":["深刻的洞察力，能看穿人心，理解他人的真实需求","理想主义坚定，为信念而奋斗，有改变世界的使命感","创造性强，善于用艺术和文字表达深层情感","坚定而有原则，是朋友中最可靠的精神支柱"],"weaknesses":["过于理想化，当现实不如预期时容易陷入失望","对自己要求过高，容易倦怠和陷入存在主义危机","难以表达真实需求，习惯性地压抑自我去照顾他人","对批评极度敏感，一句无心的话可能伤害很久"],"char":"夏目贵志","charAnime":"《夏目友人帐》","charStory":"夏目从小就能看见妖怪，却因此被排斥。他从未怨恨，反而温柔对待每一个遇到的妖怪和人类。他继承了外婆的友人帐，将自己与妖怪之间的羁绊一一归还名字。他的善良、洞察力和对他人的理解，正是INFJ的典型特质。","charQuote":"我想成为一个温柔的人，因为曾被温柔的人那样对待过。","svgc":["#00b894","#55efc4","#81ecec"]},"INFP":{"name":"调停者","alias":"瀑布蓝","group":"green","traits":["理想主义","共情","创造性","内省"],"strengths":["极强的共情力，能感受到他人无法言说的情绪","忠于内心，坚持自己的价值观，不随波逐流","富有创意，善于用艺术、文字、音乐表达深层情感","开放包容，接纳多元文化和不同的生活方式"],"weaknesses":["过于敏感，容易被细微的话语和行为伤害","回避冲突，难以表达不满，习惯性地忍让","理想主义严重，现实适应能力较弱，容易幻想","自我怀疑倾向，需要外界的肯定才能确认自己的价值"],"char":"七濑遥","charAnime":"《Free!》","charStory":"遥是一个沉默寡言的少年，但他对游泳的热爱是纯粹而深刻的。他不善于表达情感，但对朋友的感情深厚而真挚。他的世界里，游泳不是竞技，而是与水融为一体的人生哲学。INFP最迷人的地方，就是用最安静的方式，坚持最纯粹的热爱。","charQuote":"我喜欢游泳，和水在一起的时候最自由。","svgc":["#74b9ff","#a29bfe","#dfe6e9"]},"ENFJ":{"name":"主人公","alias":"太阳金","group":"green","traits":["有魅力","有同理心","引导者","利他"],"strengths":["天生的领导者，善于激励和引导他人发挥潜能","极强的共情力，能准确理解他人的需求和情感","善于沟通，能化解冲突，是团队中的黏合剂","利他主义，真心关怀他人，愿意为集体牺牲个人利益"],"weaknesses":["过于在意他人评价，容易因为别人的不满而自我怀疑","难以拒绝他人的请求，过度付出导致自己精疲力竭","对冲突极度回避，有时会牺牲自己的需求来维持和谐","有时会将自己的价值观强加于人，以为是在帮助对方"],"char":"灶门炭治郎","charAnime":"《鬼灭之刃》","charStory":"炭治郎在全家被鬼杀害后，为了让妹妹祢豆子变回人类，毅然踏上斩鬼之路。他始终保持着对他人的善意，即使面对敌人也能理解对方的痛苦和遗憾。他的领导力、共情力和坚定的信念，使他成为众人信赖的伙伴。","charQuote":"即使被绝望包围，也要相信下一刻就是希望。","svgc":["#fdcb6e","#f39c12","#e17055"]},"ENFP":{"name":"竞选者","alias":"落日橙","group":"green","traits":["热情","创意","自由","社交达人"],"strengths":["热情洋溢，感染力极强，能点燃周围所有人的斗志","创意无限，善于头脑风暴，是团队中的灵感源泉","社交达人，能快速与陌生人建立联系和信任","乐观积极，在困境中也能看到希望和可能性"],"weaknesses":["注意力容易分散，同时追逐太多目标反而一事无成","过度乐观，有时会忽视潜在的风险和实际问题","难以接受批评，会把建设性反馈当作否定","情绪波动较大，热情来得快去得也快，缺乏持久性"],"char":"漩涡鸣人","charAnime":"《火影忍者》","charStory":"鸣人从小被村民排斥，却从未放弃成为火影的梦想。他用热情和坚持感化了无数敌人，将原本充满仇恨的世界逐渐改变。从被排斥的孤儿到七代火影，鸣人的ENFP精神照亮了整个忍界。","charQuote":"我要成为火影，让所有人认可我的存在！","svgc":["#f39c12","#e17055","#fdcb6e"]},"ISTJ":{"name":"物流师","alias":"石板灰","group":"gold","traits":["可靠","务实","有序","传统"],"strengths":["极度可靠，说到做到，是团队中最值得信赖的人","注重细节，执行力强，能把每件事都做到位","组织能力强，善于管理和规划，让一切井井有条","忠诚稳定，坚守承诺，是朋友和伙伴的坚实后盾"],"weaknesses":["固执守旧，抗拒变化，新的方法会让他们感到不安","情感表达匮乏，有时显得冷酷，不善于安慰他人","对非常规事物缺乏包容，容易否定创新想法","过于严肃，难以放松和享受当下，总是想着责任"],"char":"宇智波鼬","charAnime":"《火影忍者》","charStory":"鼬为了村子的和平，独自承担了灭族的罪孽，从此以叛忍的身份活着。他极度自律，始终坚守自己的责任和原则。他的行动永远经过精密计算，为了更大的目标可以牺牲一切。这种极度的可靠性，正是ISTJ守护者的最深刻写照。","charQuote":"在这个世上，没有绝对的正义，有的是绝对的力量。","svgc":["#2d3436","#636e72","#b2bec3"]},"ISFJ":{"name":"守护者","alias":"苔藓绿","group":"gold","traits":["有爱心","忠诚","务实","保护者"],"strengths":["极度忠诚，会默默守护所爱之人，不求回报","注重细节，善于照顾他人，记得每个人的喜好","稳定可靠，是团队和家庭的基石，从不轻易放弃","记忆力强，能记住很久以前的小事和他人的需求"],"weaknesses":["难以拒绝他人，过度付出导致自己承受巨大压力","对变化极度抗拒，熟悉的环境被打破时会感到不安","压抑自己的需求，习惯性地把自己放在最后一位","对批评过于敏感，会反复咀嚼别人的负面评价"],"char":"托尼托尼·乔巴","charAnime":"《海贼王》","charStory":"乔巴是草帽海贼团中最年轻的成员，却总是默默照顾所有人的身体和健康。他害羞、善良，愿意为了伙伴付出一切。从被排斥的驯鹿到被需要的船医，乔巴的成长正是ISFJ守护者的最温暖诠释。","charQuote":"就算死也要守护大家！","svgc":["#00cec9","#81ecec","#dfe6e9"]},"ESTJ":{"name":"总经理","alias":"猎鹰棕","group":"gold","traits":["组织者","果断","传统","务实"],"strengths":["组织管理能力极强，善于统筹资源和人员","果断决策，执行力强，不会在无意义的事情上浪费时间","注重效率，善于优化流程，让团队运转更顺畅","忠诚可靠，坚守承诺和传统价值，是团队的主心骨"],"weaknesses":["过于强势，难以听取不同意见，容易一意孤行","抗拒变化和创新，新的方法会让他们感到威胁","缺乏情感敏感度，有时会因为过于直接而伤害他人","对自己的方式过度自信，难以承认自己也有不足之处"],"char":"爱德华·艾尔利克","charAnime":"《钢之炼金术师》","charStory":"爱德华·艾尔利克作为国家炼金术师，始终坚守自己的原则和承诺。他在追寻恢复弟弟身体之路上，从未放弃对真理的追求。他的果断、组织能力和对传统价值的坚守，正是ESTJ的典型特质。","charQuote":"人不付出代价，就什么都得不到。这就是等价交换。","svgc":["#6c5ce7","#a29bfe","#dfe6e9"]},"ESFJ":{"name":"执政官","alias":"珊瑚粉","group":"gold","traits":["社交","关怀","传统","有爱"],"strengths":["极强的社交能力，善于维护和谐，是团队中的黏合剂","真心关怀他人，乐于助人，会主动照顾需要帮助的人","组织能力强，善于策划活动，让每个人都感到被重视","忠诚可靠，是朋友和家人最坚实的情感后盾"],"weaknesses":["过于在意他人评价，会因为别人的不满而自我怀疑","回避冲突，难以表达真实想法，习惯性地委曲求全","对变化抗拒，熟悉的环境被打破时会感到极度不安","有时会将自己的价值观强加于人，以为是在帮助对方"],"char":"立华奏","charAnime":"《Angel Beats!》","charStory":"奏作为天使，一直在默默地守护着死者世界的每个人。她不善于表达情感，但她的行动充满了爱。她的关怀不是轰轰烈烈的，而是细水长流的。这正是ESFJ执政官的最深刻特质，爱是用行动说出来的。","charQuote":"我不讨厌这里，因为这里有很多我想珍惜的人。","svgc":["#fd79a8","#e84393","#fab1a0"]},"ISTP":{"name":"鉴赏家","alias":"银灰","group":"red","traits":["冷静","实操","冒险","独立"],"strengths":["冷静理性，在危机中能保持清醒，做出正确判断","实操能力极强，善于修理、制作和解决实际问题","独立自主，不依赖他人，有自己的节奏和方式","适应力强，善于随机应变，能在变化中找到机会"],"weaknesses":["情感表达匮乏，有时显得冷漠，不善于处理情感问题","对长期承诺畏惧，难以维持稳定的亲密关系","过于冒险，有时会忽视安全风险，追求刺激","对规则缺乏尊重，容易因为挑战权威而陷入麻烦"],"char":"折木奉太郎","charAnime":"《冰菓》","charStory":"奉太郎是一个节能主义者，只做必要的事情。但他实际上拥有极强的观察力和推理能力，在古典部的活动中逐渐展露才华，用冷静的分析解决了一个又一个谜团。他的冷静、独立和实际解决问题的能力，正是ISTP的典型特质。","charQuote":"我并不否认热情，只是不想浪费能量。","svgc":["#636e72","#b2bec3","#dfe6e9"]},"ISFP":{"name":"探险家","alias":"深海蓝","group":"red","traits":["艺术","敏感","自由","温和"],"strengths":["艺术感极强，善于用美学表达内心的情感和世界","敏感细腻，能感受到他人无法言说的细微情感","活在当下，享受生活乐趣，不被过去的遗憾束缚","温和友善，不喜冲突，会用温柔的方式表达立场"],"weaknesses":["过于敏感，容易被细微的话语和行为深深伤害","缺乏长期规划，有时会因为过于随性而陷入困境","对批评极度敏感，一句无心的话可能让心情低落很久","难以表达需求，习惯性地忍让和迁就他人"],"char":"立花泷","charAnime":"《你的名字。》","charStory":"泷是一个敏感、细腻的少年。在交换身体后，他逐渐发现了自己和三叶之间跨越时空的羁绊。他敢于追求自己的感受，最终勇敢地跨越时空去寻找那个重要的人。他的艺术感、敏感和对自由的追求，正是ISFP探险家的动人写照。","charQuote":"重要的人，不想忘记的人，绝对不能忘的人，在哪里？","svgc":["#74b9ff","#a29bfe","#81ecec"]},"ESTP":{"name":"企业家","alias":"岩浆红","group":"red","traits":["行动派","精力充沛","实用主义","社交"],"strengths":["行动力极强，说干就干，不会在无意义的犹豫中浪费时间","社交魅力十足，善于说服他人，能快速建立人脉","适应力极强，善于把握机会，在变化中如鱼得水","冷静理性，在危机中能保持清醒并迅速做出判断"],"weaknesses":["缺乏长期规划，有时会因为短视而错失更大的机会","冲动鲁莽，有时不计后果，容易让自己陷入危险","对规则缺乏尊重，容易因为挑战权威而陷入麻烦","难以专注，容易厌倦，需要不断的新鲜刺激来维持兴趣"],"char":"坂田银时","charAnime":"《银魂》","charStory":"银时是一个看似懒散、实则极其可靠的人。他在混乱的幕末时代中，始终坚持自己的武士道。他行动力极强，能在危机中保持冷静并迅速做出判断。他的幽默、社交魅力和行动派作风，正是ESTP的典型特质。","charQuote":"武士就算不挥刀，也要挺直腰板！","svgc":["#d63031","#e17055","#fab1a0"]},"ESFP":{"name":"表演者","alias":"霓虹粉","group":"red","traits":["活力","娱乐","自发性","社交"],"strengths":["活力四射，是团队中的气氛制造者，能点燃所有人的热情","活在当下，享受生活乐趣，不被过去的遗憾和未来焦虑束缚","社交达人，能快速与陌生人建立联系，让每个人感到被重视","乐观积极，在困境中也能看到希望，感染身边的人"],"weaknesses":["缺乏长期规划，有时会因为过于随性而陷入财务或情感困境","过于冲动，有时不计后果，需要学会三思而后行","对批评敏感，会因为负面评价而感到沮丧和自我怀疑","难以专注，容易分心，需要不断的新鲜刺激来维持兴趣"],"char":"孙悟空","charAnime":"《龙珠》","charStory":"悟空是纯粹的活力型角色，他活在当下，享受每一次战斗和冒险。他的乐观、活力和用行动说话的作风，正是ESFP的典型写照。他不被复杂的情感或长远的规划束缚，只是单纯地追求变强和守护伙伴的快乐。","charQuote":"我还会变得更强！","svgc":["#e17055","#fab1a0","#fdcb6e"]}};
+window.QUESTIONS = [{"dim":["E","I"],"text":"在社交场合中，你通常是？","left":"精力来自外部刺激，社交后精力充沛","right":"需要独处来充电，社交后感到疲惫"},{"dim":["E","I"],"text":"你更喜欢？","left":"大型聚会，认识新朋友","right":"小型深入交谈，与熟悉的朋友"},{"dim":["E","I"],"text":"你的社交风格更接近？","left":"善于表达，想到什么说什么","right":"善于倾听，思考后再回应"},{"dim":["E","I"],"text":"工作学习方式？","left":"喜欢团队合作，互相讨论","right":"喜欢独自完成，专注深度思考"},{"dim":["E","I"],"text":"社交圈？","left":"广泛社交，认识各种类型的人","right":"精选好友，少数深度关系"},{"dim":["E","I"],"text":"在陌生环境中？","left":"主动与人交谈，快速融入","right":"先观察，等待合适时机再交流"},{"dim":["E","I"],"text":"周末更喜欢？","left":"约朋友出去活动","right":"一个人在家看书看电影休息"},{"dim":["S","N"],"text":"你更关注？","left":"具体事实和细节，脚踏实地","right":"抽象概念和可能性，放眼未来"},{"dim":["S","N"],"text":"学习方式？","left":"按部就班，step by step","right":"整体把握，先理解大局"},{"dim":["S","N"],"text":"面对新事物？","left":"基于经验，稳妥尝试","right":"基于理论，大胆创新"},{"dim":["S","N"],"text":"你更信任？","left":"实际经验和感官证据","right":"直觉和第六感"},{"dim":["S","N"],"text":"记忆方式？","left":"记住具体事件和细节","right":"记住整体感受和印象"},{"dim":["S","N"],"text":"做事风格？","left":"务实可行，注重落地","right":"富有想象，注重创意"},{"dim":["S","N"],"text":"面对规则？","left":"尊重传统，稳步改进","right":"敢于打破，追求变革"},{"dim":["T","F"],"text":"做决定时更偏向？","left":"逻辑分析，追求客观真理","right":"价值观判断，考虑他人感受"},{"dim":["T","F"],"text":"面对冲突？","left":"直接指出问题，追求解决","right":"委婉表达，维护关系和谐"},{"dim":["T","F"],"text":"批评他人时？","left":"直率坦诚，就事论事","right":"小心措辞，顾及对方情绪"},{"dim":["T","F"],"text":"你认为更重要的是？","left":"公正客观，人人平等对待","right":"体谅包容，特殊情况特殊对待"},{"dim":["T","F"],"text":"工作中的优先级？","left":"效率和结果至上","right":"团队氛围和感受至上"},{"dim":["T","F"],"text":"面对道歉？","left":"看是否真正解决问题","right":"看对方是否真诚反省"},{"dim":["T","F"],"text":"选择伙伴时？","left":"能力优先，能解决问题","right":"价值观优先，志同道合"},{"dim":["J","P"],"text":"你的生活方式更接近？","left":"计划有序，提前安排","right":"随性而为，顺其自然"},{"dim":["J","P"],"text":"面对截止日期？","left":"提前完成，留有缓冲","right":"最后一刻完成，享受紧迫感"},{"dim":["J","P"],"text":"旅行方式？","left":"详细攻略，每个细节都规划好","right":"说走就走，沿途决定"},{"dim":["J","P"],"text":"工作环境？","left":"整洁有序，一切各就各位","right":"创意混乱，在混乱中找到灵感"},{"dim":["J","P"],"text":"做决定时？","left":"果断决定，不喜欢悬而未决","right":"保留选项，随时准备调整"},{"dim":["J","P"],"text":"周末计划？","left":"列出清单，逐项完成","right":"随心所欲，想做什么就做什么"},{"dim":["J","P"],"text":"面对意外变化？","left":"感到不安，希望回到原计划","right":"感到兴奋，视其为新的机会"}];
+window.CG = {"blue":{"n":"蓝色组·分析家","c":"#3b82f6","b":"#1e3a5f","d":"理性分析型，追求逻辑与效率"},"green":{"n":"绿色组·外交家","c":"#22c55e","b":"#1a4a2e","d":"共情理想型，追求和谐与意义"},"gold":{"n":"金色组·守护者","c":"#eab308","b":"#4a3f0a","d":"务实负责型，追求秩序与服务"},"red":{"n":"红色组·探险家","c":"#ef4444","b":"#4a1414","d":"自由行动型，追求体验与刺激"}};
+
+(function(){
+  var currentQ = 0;
+  var answers = [];
+
+  window.startTest = function() {
+    document.getElementById("page-start").classList.remove("active");
+    document.getElementById("page-test").classList.add("active");
+    currentQ = 0;
+    answers = new Array(28).fill(null);
+    showQuestion();
+  };
+
+  function showQuestion() {
+    var q = window.QUESTIONS[currentQ];
+    document.getElementById("q-num").textContent = "第 " + (currentQ+1) + " / 28 题";
+    document.getElementById("prog-fill").style.width = ((currentQ/28)*100) + "%";
+    document.getElementById("prog-text").textContent = (currentQ+1) + " / 28";
+    document.getElementById("q-text").textContent = q.text;
+    var opts = document.getElementById("q-opts");
+    var lv = (answers[currentQ] === 0) ? " selected" : "";
+    var rv = (answers[currentQ] === 1) ? " selected" : "";
+    opts.innerHTML = "<div class=\"q-opt" + lv + "\" onclick=\"selOpt(0)\">" + q.left + "</div>" + "<div class=\"q-opt" + rv + "\" onclick=\"selOpt(1)\">" + q.right + "</div>";
+    document.getElementById("btn-prev").style.display = (currentQ === 0) ? "none" : "";
+    document.getElementById("btn-next").style.display = (currentQ < 27) ? "" : "none";
+    document.getElementById("btn-submit").style.display = (currentQ === 27) ? "" : "none";
+  }
+
+  window.selOpt = function(idx) {
+    answers[currentQ] = idx;
+    var opts = document.querySelectorAll(".q-opt");
+    opts.forEach(function(o,i){ o.classList.toggle("selected", i === idx); });
+    if (currentQ < 27) setTimeout(function(){ window.nextQ(); }, 300);
+  };
+
+  window.nextQ = function() { if (currentQ < 27) { currentQ++; showQuestion(); } };
+  window.prevQ = function() { if (currentQ > 0) { currentQ--; showQuestion(); } };
+
+  window.submitTest = function() {
+    if (answers.indexOf(null) !== -1) { alert("请完成所有题目后再提交"); return; }
+    var scores = {E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0};
+    for (var i = 0; i < 28; i++) {
+      var key = window.QUESTIONS[i].dim[answers[i]];
+      scores[key]++;
+    }
+    var typeKey = (scores.E >= scores.I ? "E" : "I") + (scores.S >= scores.N ? "S" : "N") + (scores.T >= scores.F ? "T" : "F") + (scores.J >= scores.P ? "J" : "P");
+    showResult(typeKey, scores);
+  };
+
+  function genAv(k) {
+    var t = window.TYPES[k];
+    var c = t.svgc;
+    var s = "<svg viewBox=\"0 0 100 100\" xmlns=\"http://www.w3.org/2000/svg\">";
+    s += "<defs><linearGradient id=\"g" + k + "\" x1=\"0%\" y1=\"0%\" x2=\"100%\" y2=\"100%\"><stop offset=\"0%\" style=\"stop-color:" + c[0] + ";stop-opacity:1\"/><stop offset=\"100%\" style=\"stop-color:" + c[1] + ";stop-opacity:1\"/></linearGradient>";
+    s += "<radialGradient id=\"e" + k + "\" cx=\"50%\" cy=\"40%\"><stop offset=\"0%\" style=\"stop-color:#fff;stop-opacity:0.3\"/><stop offset=\"100%\" style=\"stop-color:" + c[2] + ";stop-opacity:0.1\"/></radialGradient></defs>";
+    s += "<circle cx=\"50\" cy=\"50\" r=\"48\" fill=\"url(#g" + k + ")\" stroke=\"" + c[2] + "\" stroke-width=\"2\"/><circle cx=\"50\" cy=\"50\" r=\"48\" fill=\"url(#e" + k + ")\"/>";
+    s += "<path d=\"M20,45 Q15,20 50,10 Q85,20 80,45 Q75,15 50,8 Q25,15 20,45Z\" fill=\"" + c[2] + "\" opacity=\"0.8\"/>";
+    s += "<ellipse cx=\"50\" cy=\"55\" rx=\"22\" ry=\"26\" fill=\"#fdd\"/><ellipse cx=\"41\" cy=\"52\" rx=\"3.5\" ry=\"4\" fill=\"#333\"/><ellipse cx=\"59\" cy=\"52\" rx=\"3.5\" ry=\"4\" fill=\"#333\"/><circle cx=\"42\" cy=\"51\" r=\"1.2\" fill=\"#fff\"/><circle cx=\"60\" cy=\"51\" r=\"1.2\" fill=\"#fff\"/><path d=\"M44,65 Q50,70 56,65\" stroke=\"#c66\" stroke-width=\"1.5\" fill=\"none\" stroke-linecap=\"round\"/><text x=\"50\" y=\"92\" text-anchor=\"middle\" fill=\"#fff\" font-size=\"8\" font-weight=\"bold\" opacity=\"0.8\">" + k + "</text></svg>";
+    return s;
+  }
+
+  window.showResult = function(typeKey, scores) {
+    var t = window.TYPES[typeKey];
+    var cg = window.CG[t.group];
+    document.getElementById("page-test").classList.remove("active");
+    var pageR = document.getElementById("page-result");
+    pageR.classList.add("active");
+    var av = genAv(typeKey);
+    var db = "";
+    [{l:"E外向",v:scores.E,c:"#60a5fa"},{l:"I内向",v:scores.I,c:"#818cf8"},{l:"S实感",v:scores.S,c:"#34d399"},{l:"N直觉",v:scores.N,c:"#a78bfa"},{l:"T思考",v:scores.T,c:"#f87171"},{l:"F情感",v:scores.F,c:"#fb923c"},{l:"J判断",v:scores.J,c:"#eab308"},{l:"P感知",v:scores.P,c:"#f472b6"}].forEach(function(d){
+      db += "<div class=\"dim-bar\"><div class=\"dim-label\">" + d.l + "</div><div class=\"dim-val\" style=\"color:" + d.c + "\">" + d.v + "</div><div style=\"font-size:0.7rem;color:#64748b\">" + Math.round(d.v/14*100) + "%</div></div>";
+    });
+    var sh = ""; t.strengths.forEach(function(s){ var p = s.split("，")[0] || s; sh += "<div class=\"sw-item\"><div class=\"sw-label\">✦ " + p + "</div><div>" + s + "</div></div>"; });
+    var wh = ""; t.weaknesses.forEach(function(w){ var p = w.split("，")[0] || w; wh += "<div class=\"sw-item weak\"><div class=\"sw-label\">⚠ " + p + "</div><div>" + w + "</div></div>"; });
+    var ah = ""; Object.keys(window.TYPES).forEach(function(k2){ var tt = window.TYPES[k2]; var cc = window.CG[tt.group]; ah += "<div class=\"at-item\" onclick=\"showResult(\"" + k2 + "\",calcScores(\"" + k2 + "\"))\" style=\"border-color:" + cc.c + "44\"><div class=\"at-type\" style=\"color:" + cc.c + "\">" + k2 + "</div><div class=\"at-name\">" + tt.name + "</div></div>"; });
+    var cav = av.replace("100 100","64 64").replace('r="48"','r="30"').replace("92","60").replace(/8px/g,"5px");
+    pageR.innerHTML =
+      "<div class=\"result-hero\"><div class=\"result-avatar\">" + av + "</div>" +
+      "<div class=\"result-type\">" + typeKey + "</div>" +
+      "<div class=\"result-name\">" + t.name + " · " + t.traits.join(" · ") + "</div>" +
+      "<div class=\"result-alias\">" + t.alias + " · " + cg.n + "</div>" +
+      "<div class=\"color-badge\" style=\"background:" + cg.bg + ";color:" + cg.c + ";border:1px solid " + cg.c + "44\">" + cg.n + " — " + cg.d + "</div></div>" +
+      "<div class=\"result-dims\">" + db + "</div>" +
+      "<div class=\"section\"><div class=\"section-title\"><span class=\"icon\">✦</span>核心优势</div><div class=\"sw-list\">" + sh + "</div></div>" +
+      "<div class=\"section\"><div class=\"section-title\"><span class=\"icon\">⚠</span>潜在短板</div><div class=\"sw-list\">" + wh + "</div></div>" +
+      "<div class=\"section\"><div class=\"section-title\"><span class=\"icon\">★</span>动漫代表人物</div><div class=\"char-card\"><div class=\"char-avatar\">" + cav + "</div><div class=\"char-info\"><h4>" + t.char + "</h4><div class=\"anime\">" + t.charAnime + "</div><div class=\"story\">" + t.charStory + "</div><div class=\"quote\">「" + t.charQuote + "」</div></div></div></div>" +
+      "<div class=\"section\"><div class=\"section-title\"><span class=\"icon\">◈</span>16型人格速览</div><div class=\"all-types\">" + ah + "</div></div>" +
+      "<div class=\"action-btns\"><button class=\"action-btn primary\" onclick=\"startTest()\">重新测试</button><button class=\"action-btn\" onclick=\"shareR()\">分享结果</button></div>";
+    pageR.scrollIntoView({behavior:"smooth"});
+  };
+
+  window.calcScores = function(k) {
+    var s = {E:0,I:0,S:0,N:0,T:0,F:0,J:0,P:0};
+    if (k[0] === "E") { s.E = 10; s.I = 4; } else { s.I = 10; s.E = 4; }
+    if (k[1] === "S") { s.S = 10; s.N = 4; } else { s.N = 10; s.S = 4; }
+    if (k[2] === "T") { s.T = 10; s.F = 4; } else { s.F = 10; s.T = 4; }
+    if (k[3] === "J") { s.J = 10; s.P = 4; } else { s.P = 10; s.J = 4; }
+    return s;
+  };
+
+  window.shareR = function() {
+    var typeKey = document.querySelector(".result-type").textContent.trim();
+    var t = window.TYPES[typeKey];
+    var text = "[MBTI测试结果] " + typeKey + " " + t.name + " — " + t.traits.join(" · ") + " " + location.href;
+    if (navigator.share) { navigator.share({title:"MBTI测试结果",text:text,url:location.href}).catch(function(){}); }
+    else { navigator.clipboard.writeText(text).then(function(){alert("结果已复制！");}).catch(function(){alert(text);}); }
+  };
+
+  (function() {
+    var c = document.getElementById("particles");
+    if (!c) return;
+    for (var i = 0; i < 25; i++) {
+      var p = document.createElement("div");
+      p.className = "particle";
+      p.style.left = Math.random() * 100 + "%";
+      p.style.animationDuration = (8 + Math.random() * 14) + "s";
+      p.style.animationDelay = (Math.random() * 10) + "s";
+      p.style.opacity = (0.1 + Math.random() * 0.2) + "";
+      c.appendChild(p);
+    }
+  })();
+})();
+</script>
+</body>
+</html>
