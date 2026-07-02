@@ -1,16 +1,26 @@
 name: Deploy to GitHub Pages
-on:/n  push:/n    branches: [main]
-  workflow_dispatch:/npermissions:/n  contents: read
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
   pages: write
   id-token: write
-concurrency:/n  group: pages
+concurrency:
+  group: pages
   cancel-in-progress: false
-jobs:/n  deploy:/n    environment:/n      name: github-pages
+jobs:
+  deploy:
+    environment:
+      name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    steps:/n      - uses: actions/checkout@v4
+    steps:
+      - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
-        with:/n          path: .
+        with:
+          path: .
       - id: deployment
         uses: actions/deploy-pages@v4
